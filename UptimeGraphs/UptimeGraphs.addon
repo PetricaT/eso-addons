@@ -1,0 +1,8 @@
+## Title: Uptime Graphs
+## Description: Per-ability uptime timelines. Logs only in combat, processes only after.
+## Version: 1.0.0
+## APIVersion: 101051
+## SavedVariables: UptimeGraphs_SV
+
+UptimeGraphs.xml
+UptimeGraphs.lua

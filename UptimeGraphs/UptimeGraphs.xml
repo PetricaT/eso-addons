@@ -1,0 +1,137 @@
+<GuiXml>
+    <Controls>
+        <Control name="UG_Row" virtual="true">
+            <Dimensions x="660" y="30" />
+            <Controls>
+                <Texture name="$(parent)Icon">
+                    <Dimensions x="24" y="24" />
+                    <Anchor point="LEFT" offsetX="4" />
+                </Texture>
+                <Label name="$(parent)Name" font="ZoFontGameSmall" wrapMode="ELLIPSIS" maxLineCount="1" verticalAlignment="CENTER">
+                    <Dimensions x="190" y="24" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Icon" relativePoint="RIGHT" offsetX="6" />
+                </Label>
+                <Label name="$(parent)Pct" font="ZoFontGameBold" horizontalAlignment="RIGHT" verticalAlignment="CENTER">
+                    <Dimensions x="54" y="24" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Name" relativePoint="RIGHT" offsetX="4" />
+                </Label>
+                <Control name="$(parent)Bar">
+                    <Dimensions x="380" y="20" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Pct" relativePoint="RIGHT" offsetX="10" />
+                    <Controls>
+                        <Texture name="$(parent)BG" color="000000" alpha="0.55">
+                            <AnchorFill />
+                        </Texture>
+                        <!-- Same declaration style ZOS uses (XML composite + AddSurface at runtime). Texture ships with the game. -->
+                        <TextureComposite name="$(parent)Graph" textureFile="EsoUI/Art/Dye/swatch_multiTexture.dds" level="1">
+                            <AnchorFill />
+                        </TextureComposite>
+                    </Controls>
+                </Control>
+            </Controls>
+        </Control>
+
+        <!-- one line of the comparison panel: ability | previous -> now | change -->
+        <Control name="UG_DeltaRow" virtual="true">
+            <Dimensions x="300" y="26" />
+            <Controls>
+                <Label name="$(parent)Name" font="ZoFontGameSmall" wrapMode="ELLIPSIS" maxLineCount="1" verticalAlignment="CENTER">
+                    <Dimensions x="116" y="22" />
+                    <Anchor point="LEFT" offsetX="4" />
+                </Label>
+                <Label name="$(parent)Mid" font="ZoFontGameSmall" horizontalAlignment="RIGHT" verticalAlignment="CENTER">
+                    <Dimensions x="100" y="22" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Name" relativePoint="RIGHT" offsetX="4" />
+                </Label>
+                <Label name="$(parent)Delta" font="ZoFontGameBold" horizontalAlignment="RIGHT" verticalAlignment="CENTER">
+                    <Dimensions x="62" y="22" />
+                    <Anchor point="LEFT" relativeTo="$(parent)Mid" relativePoint="RIGHT" offsetX="4" />
+                </Label>
+            </Controls>
+        </Control>
+
+        <TopLevelControl name="UptimeGraphsWindow" hidden="true" movable="true" mouseEnabled="true" clampedToScreen="true" resizeHandleSize="8">
+            <Dimensions x="780" y="660" />
+            <Anchor point="TOPLEFT" relativeTo="GuiRoot" offsetX="160" offsetY="100" />
+            <DimensionConstraints minX="600" minY="380" maxX="2400" maxY="1600" />
+            <OnMoveStop>UptimeGraphs.OnMoveStop()</OnMoveStop>
+            <OnResizeStop>UptimeGraphs.OnResizeStop()</OnResizeStop>
+            <OnShow>UptimeGraphs.OnShow()</OnShow>
+            <OnHide>UptimeGraphs.OnHide()</OnHide>
+            <Controls>
+                <Backdrop name="$(parent)BG" inherits="ZO_DefaultBackdrop" />
+
+                <Label name="$(parent)Title" font="ZoFontWinH2" text="Uptime Graphs">
+                    <Anchor point="TOPLEFT" offsetX="16" offsetY="10" />
+                </Label>
+                <Button name="$(parent)Close" inherits="ZO_CloseButton">
+                    <Anchor point="TOPRIGHT" offsetX="-8" offsetY="8" />
+                    <OnClicked>UptimeGraphs.Toggle()</OnClicked>
+                </Button>
+
+                <!-- encounter browser -->
+                <Button name="$(parent)NavPrev" inherits="ZO_PreviousArrowButton">
+                    <Anchor point="TOPLEFT" offsetX="16" offsetY="46" />
+                    <OnClicked>UptimeGraphs.NavPrev()</OnClicked>
+                </Button>
+                <Label name="$(parent)NavCount" font="ZoFontGameBold" horizontalAlignment="CENTER">
+                    <Dimensions x="64" y="20" />
+                    <Anchor point="LEFT" relativeTo="$(parent)NavPrev" relativePoint="RIGHT" offsetX="2" />
+                </Label>
+                <Button name="$(parent)NavNext" inherits="ZO_NextArrowButton">
+                    <Anchor point="LEFT" relativeTo="$(parent)NavCount" relativePoint="RIGHT" offsetX="2" />
+                    <OnClicked>UptimeGraphs.NavNext()</OnClicked>
+                </Button>
+                <Label name="$(parent)Info" font="ZoFontGameSmall" wrapMode="ELLIPSIS" maxLineCount="1">
+                    <Anchor point="LEFT" relativeTo="$(parent)NavNext" relativePoint="RIGHT" offsetX="12" />
+                </Label>
+                <Button name="$(parent)CompareCheck" inherits="ZO_CheckButton" />
+
+                <!-- time axis, aligned to the bar column by Layout() -->
+                <Label name="$(parent)AxisStart" font="ZoFontGameSmall" />
+                <Label name="$(parent)AxisMid" font="ZoFontGameSmall" />
+                <Label name="$(parent)AxisEnd" font="ZoFontGameSmall" />
+
+                <!-- table 1: skills on the player's bars -->
+                <Label name="$(parent)ActivesLabel" font="ZoFontGameBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_SELECTED" />
+                <Control name="$(parent)Actives" inherits="ZO_ScrollList" />
+
+                <Texture name="$(parent)Divider" color="FFFFFF" alpha="0.3">
+                    <Dimensions y="1" />
+                </Texture>
+
+                <!-- table 2: everything else -->
+                <Label name="$(parent)PassivesLabel" font="ZoFontGameBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_SELECTED" />
+                <Control name="$(parent)Passives" inherits="ZO_ScrollList" />
+            </Controls>
+        </TopLevelControl>
+
+        <!-- Attached comparison panel (current parse vs the one before it). Shown only while "Compare" is ticked. -->
+        <TopLevelControl name="UptimeGraphsCompare" hidden="true" mouseEnabled="true">
+            <Dimensions x="330" y="400" />
+            <Anchor point="TOPLEFT" relativeTo="GuiRoot" offsetX="960" offsetY="100" />
+            <Controls>
+                <Backdrop name="$(parent)BG" inherits="ZO_DefaultBackdrop" />
+                <Label name="$(parent)Title" font="ZoFontWinH3" text="Change vs previous parse">
+                    <Anchor point="TOPLEFT" offsetX="14" offsetY="10" />
+                </Label>
+                <Label name="$(parent)Sub" font="ZoFontGameSmall" wrapMode="ELLIPSIS" maxLineCount="1">
+                    <Dimensions x="302" />
+                    <Anchor point="TOPLEFT" offsetX="14" offsetY="38" />
+                </Label>
+                <Label name="$(parent)Msg" font="ZoFontGameSmall" wrapMode="ELLIPSIS">
+                    <Dimensions x="302" />
+                    <Anchor point="TOPLEFT" offsetX="14" offsetY="84" />
+                </Label>
+
+                <Label name="$(parent)ActivesLabel" font="ZoFontGameBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_SELECTED" />
+                <Control name="$(parent)Actives" inherits="ZO_ScrollList" />
+                <Texture name="$(parent)Divider" color="FFFFFF" alpha="0.3">
+                    <Dimensions y="1" />
+                </Texture>
+                <Label name="$(parent)PassivesLabel" font="ZoFontGameBold" color="INTERFACE_COLOR_TYPE_TEXT_COLORS:INTERFACE_TEXT_COLOR_SELECTED" />
+                <Control name="$(parent)Passives" inherits="ZO_ScrollList" />
+            </Controls>
+        </TopLevelControl>
+    </Controls>
+</GuiXml>
